@@ -1,21 +1,25 @@
 import http from "node:http";
 import "dotenv/config";
+import { json } from "./middlewares/json.js";
 
 const users = [];
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const { method, url } = req;
 
+  await json(req, res);
+
   if (method === "GET" && url === "/users") {
-    return res
-      .setHeader("Content-Type", "application/json")
-      .end(JSON.stringify(users));
+    return res.end(JSON.stringify(users));
   }
+
   if (method === "POST" && url === "/users") {
+    const { name, email } = req.body;
+    const id = Math.floor(Math.random() * 100);
     users.push({
-      id: 1,
-      name: "Wagner",
-      email: "wcfx.dev@gmail.com",
+      id,
+      name,
+      email,
     });
 
     return res.writeHead(201).end();
